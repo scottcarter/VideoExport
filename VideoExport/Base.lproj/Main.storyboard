@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="ufC-wZ-h7g">
+            <objects>
+                <viewController id="vXZ-lx-hvc" customClass="ViewController" customModule="VideoExport" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
+                        <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pNJ-Ng-7vz">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="uQP-vc-akr"/>
+                                    <barButtonItem title="Library" id="dqp-O1-lfE">
+                                        <connections>
+                                            <action selector="libraryAction:" destination="vXZ-lx-hvc" id="pgg-mN-Oax"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="4lk-KQ-lS8"/>
+                                </items>
+                            </toolbar>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P8H-y0-UCj" userLabel="MovieView">
+                                <rect key="frame" x="0.0" y="20" width="600" height="536"/>
+                                <color key="backgroundColor" red="0.90105736260000002" green="1" blue="0.89830857519999996" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="qVU-Wn-mi2">
+                                <rect key="frame" x="281" y="269" width="37" height="37"/>
+                                <color key="color" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </activityIndicatorView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="0.87843137250000003" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="P8H-y0-UCj" firstAttribute="centerY" secondItem="qVU-Wn-mi2" secondAttribute="centerY" id="1vU-Kz-PHZ"/>
+                            <constraint firstItem="pNJ-Ng-7vz" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-16" id="K90-dX-E8h"/>
+                            <constraint firstItem="pNJ-Ng-7vz" firstAttribute="top" secondItem="P8H-y0-UCj" secondAttribute="bottom" id="OK7-5S-Gj1" userLabel="bottomVerticalSpaceConstraint"/>
+                            <constraint firstItem="P8H-y0-UCj" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="RYw-j7-Mzg" userLabel="leftHorizontalSpaceConstraint"/>
+                            <constraint firstItem="P8H-y0-UCj" firstAttribute="centerX" secondItem="qVU-Wn-mi2" secondAttribute="centerX" id="SbQ-lI-ngP"/>
+                            <constraint firstAttribute="trailing" secondItem="P8H-y0-UCj" secondAttribute="trailing" id="cUs-zv-3Ih" userLabel="rightHorizontalSpaceConstraint"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="pNJ-Ng-7vz" secondAttribute="bottom" id="hBQ-ZO-fgj"/>
+                            <constraint firstItem="P8H-y0-UCj" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" id="th3-uD-llP" userLabel="topVerticalSpaceConstraint"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="pNJ-Ng-7vz" secondAttribute="trailing" constant="-16" id="xeS-z9-WER"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="activityIndicator" destination="qVU-Wn-mi2" id="dMH-w4-f4V"/>
+                        <outlet property="bottomVerticalSpaceConstraint" destination="OK7-5S-Gj1" id="9fV-n0-GIO"/>
+                        <outlet property="leftHorizontalSpaceConstraint" destination="RYw-j7-Mzg" id="vnC-ba-WGQ"/>
+                        <outlet property="movieView" destination="P8H-y0-UCj" id="OjC-rn-TgL"/>
+                        <outlet property="rightHorizontalSpaceConstraint" destination="cUs-zv-3Ih" id="qO5-Xg-N0J"/>
+                        <outlet property="toolbar" destination="pNJ-Ng-7vz" id="35e-Gh-UCy"/>
+                        <outlet property="topVerticalSpaceConstraint" destination="th3-uD-llP" id="GzE-6n-svQ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>

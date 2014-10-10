@@ -1,0 +1,17 @@
+PODS:
+  - SDAVAssetExportSession (0.0.1)
+  - SVProgressHUD (1.0)
+
+DEPENDENCIES:
+  - SDAVAssetExportSession (from `https://github.com/rs/SDAVAssetExportSession.git`)
+  - SVProgressHUD (= 1.0)
+
+EXTERNAL SOURCES:
+  SDAVAssetExportSession:
+    :git: https://github.com/rs/SDAVAssetExportSession.git
+
+SPEC CHECKSUMS:
+  SDAVAssetExportSession: ec9d0170773bc83e8c8fbfaf4012bf1fb854725d
+  SVProgressHUD: 5034c6e22b8c2ca3e09402e48d41ed0340aa1c50
+
+COCOAPODS: 0.34.1
