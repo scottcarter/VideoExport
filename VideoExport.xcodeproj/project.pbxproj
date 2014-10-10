@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6D12C448D8F283CFBB35FB6C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 491CFD608DD5FB8039D1DEF1 /* libPods.a */; };
+		A70738B019E86BCF0022414F /* SNLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70738AF19E86BCF0022414F /* SNLog.swift */; };
 		A7323DAC19E4486600EA848E /* VideoComposition.m in Sources */ = {isa = PBXBuildFile; fileRef = A7323DAB19E4486600EA848E /* VideoComposition.m */; };
-		A757FE1119E777C700F0FB01 /* SNLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A757FE1019E777C700F0FB01 /* SNLog.swift */; };
 		A7BB70B719DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BB70B619DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m */; };
 		A7E7BB7519CCCEC100B97941 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E7BB7419CCCEC100B97941 /* AppDelegate.swift */; };
 		A7E7BB7719CCCEC100B97941 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E7BB7619CCCEC100B97941 /* ViewController.swift */; };
@@ -32,9 +32,9 @@
 		20398AFD9FC2E8932DEDD2E0 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		491CFD608DD5FB8039D1DEF1 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6088C34504FD20773B76F255 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		A70738AF19E86BCF0022414F /* SNLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNLog.swift; sourceTree = "<group>"; };
 		A7323DAA19E4486600EA848E /* VideoComposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoComposition.h; sourceTree = "<group>"; };
 		A7323DAB19E4486600EA848E /* VideoComposition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoComposition.m; sourceTree = "<group>"; };
-		A757FE1019E777C700F0FB01 /* SNLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNLog.swift; sourceTree = "<group>"; };
 		A7BB70B419DC51F300628020 /* VideoExport-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VideoExport-Bridging-Header.h"; sourceTree = "<group>"; };
 		A7BB70B519DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ALAssetsLibrary+CustomPhotoAlbum.h"; sourceTree = "<group>"; };
 		A7BB70B619DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ALAssetsLibrary+CustomPhotoAlbum.m"; sourceTree = "<group>"; };
@@ -109,7 +109,7 @@
 		A7E7BB7119CCCEC100B97941 /* VideoExport */ = {
 			isa = PBXGroup;
 			children = (
-				A757FE1019E777C700F0FB01 /* SNLog.swift */,
+				A70738AF19E86BCF0022414F /* SNLog.swift */,
 				A7BB70B519DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.h */,
 				A7BB70B619DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m */,
 				A7E7BB9619CD293D00B97941 /* README.h */,
@@ -285,7 +285,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7323DAC19E4486600EA848E /* VideoComposition.m in Sources */,
-				A757FE1119E777C700F0FB01 /* SNLog.swift in Sources */,
+				A70738B019E86BCF0022414F /* SNLog.swift in Sources */,
 				A7E7BB7719CCCEC100B97941 /* ViewController.swift in Sources */,
 				A7E7BB7519CCCEC100B97941 /* AppDelegate.swift in Sources */,
 				A7BB70B719DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m in Sources */,
@@ -405,7 +405,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 20398AFD9FC2E8932DEDD2E0 /* Pods.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
@@ -422,7 +421,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6088C34504FD20773B76F255 /* Pods.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;

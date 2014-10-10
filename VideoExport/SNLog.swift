@@ -5,59 +5,74 @@
 
 import Foundation
 
-// These variables can be used to insert a warning with the signature 'Fixme'.
-// Example:
-// g_fixme = g_anyFixme as Fixme
+// Insert a warning in the Issue Navigator with the signature 'SNLog.Fixme'.
+//
+// Usage:
+// g_fixme = g_anyFixme as SNLog.Fixme
 //
 // Warning reads:
-// Treating a forced downcast to 'Fixme' as optional will never produce 'nil'
+// Treating a forced downcast to 'SNLog.Fixme' as optional will never produce 'nil'
 //
-var g_anyFixme: AnyObject? = Fixme()
-var g_fixme: Fixme?
+var g_anyFixme: AnyObject? = SNLog.Fixme()
+var g_fixme: SNLog.Fixme?
 
 
-// Used in conjunction with a call to SNLog.info to both log and create a warning
-// with the signature 'SNLog'
+
+// Log a message and optionally insert a warning in the Issue Navigator with the signature 'SNLog'
 //
-// Example with warning:
-// g_log = SNLog.info("") as SNLog
+// Usage with Issue Navigator warning:
+// g_log = SNLog.log("<message>") as SNLog
+// g_log = SNLog.info("<message>") as SNLog
+// g_log = SNLog.error("<message>") as SNLog
 //
 // Warning reads:
 // Treating a forced downcast to 'SNLog' as optional will never produce 'nil'
 //
-// Example without warning:
-// SNLog.info("")
+//
+// Usage without Issue Navigator warning:
+// SNLog.log("<message>")
+// SNLog.info("<message>")
+// SNLog.error("<message>")
+//
+// Note:
+// In a closure that returns Void, a call to SNLog.[log|info|error] (which returns AnyObject) cannot
+// be the last statement. If you need to return Void, try something like:
+//
+// SNLog.info("<message>")
+// Void()
 //
 var g_log: SNLog?
 
 
 
-class Fixme { }
+
 
 class SNLog {
     
+    class Fixme { }
     
-    // The error() method prefixes "ERROR:" and calls info()
-    class func error (message: String, filePath: String = __FILE__, function: String = __FUNCTION__,  line: Int32 = __LINE__) -> AnyObject {
-        let newMessage = "ERROR: " + message
-        return info(newMessage, filePath: filePath, function: function, line: line)
+    // The log() method calls display() with no prefix
+    class func log (message: String, filePath: String = __FILE__, function: String = __FUNCTION__,  line: Int32 = __LINE__) -> AnyObject {
+        return display("", message: message, filePath: filePath, function: function, line: line)
     }
     
-    
-    // Note:
-    // In a function that returns Void, a call to SNLog.info (which returns AnyObject) cannot
-    // be last statement. Instead use:
-    //
-    // SNLog.info("<message>")
-    // Void()
+    // The info() method calls display() with the prefix "INFO: "
     class func info (message: String, filePath: String = __FILE__, function: String = __FUNCTION__,  line: Int32 = __LINE__) -> AnyObject {
+        return display("INFO: ", message: message, filePath: filePath, function: function, line: line)
+    }
+    
+    // The error() method calls display() with the prefix "ERROR: "
+    class func error (message: String, filePath: String = __FILE__, function: String = __FUNCTION__,  line: Int32 = __LINE__) -> AnyObject {
+        return display("ERROR: ", message: message, filePath: filePath, function: function, line: line)
+    }
+
+    private class func display (prefix: String, message: String, filePath: String, function: String,  line: Int32) -> AnyObject {
         let file: String = filePath.lastPathComponent
         
-        println("\(file) - \(function)(\(line)):\n \(message)\n")
+        println("\(prefix)\(file) - \(function)(\(line)):\n \(message)\n")
         
         return SNLog()
     }
-    
     
 }
 

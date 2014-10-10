@@ -81,7 +81,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         self.player?.pause()
         
         
-        g_fixme = g_anyFixme as Fixme
+        g_fixme = g_anyFixme as SNLog.Fixme
         // Investigate transitions?
         // http://stackoverflow.com/questions/18890003/uiimagepickercontroller-error-snapshotting-a-view-that-has-not-been-rendered-re
        
@@ -155,7 +155,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     func moviePlayerPlaybackDidFinishNotification(notification: NSNotification) -> Void {
         var notif: NSDictionary! = notification.userInfo
         
-        // Log.info("\(notif)")
+        // SNLog.info("\(notif)")
     }
     
 
@@ -165,7 +165,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         var notif: NSDictionary! = notification.userInfo
         
-        // Log.info("\(notif)")
+        // SNLog.info("\(notif)")
         
         
         // We set the frame for our movie player in viewDidLayoutSubviews, so
@@ -291,7 +291,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
 //    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
 //        let transitionToWide = size.width > size.height
 //        
-//        Log.info("transitionToWide=\(transitionToWide)")
+//        SNLog.info("transitionToWide=\(transitionToWide)")
 //        
 //    }
     
@@ -299,7 +299,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     override func viewDidLayoutSubviews() {
         
-        // Log.info("")
+        // SNLog.info("")
         
         // Let's record status bar height for later use.  
         // http://stackoverflow.com/questions/12991935/how-to-programmatically-get-ios-status-bar-height
@@ -323,7 +323,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             // Min
             self.statusBarHeight = statusBarSize.width < statusBarSize.height ? statusBarSize.width : statusBarSize.height
             
-            // Log.info("statusBarSize=\(statusBarSize)  self.statusBarHeight=\(self.statusBarHeight)")
+            // SNLog.info("statusBarSize=\(statusBarSize)  self.statusBarHeight=\(self.statusBarHeight)")
         }
         
         // Update our movie player frame in the event that we rotated.
@@ -355,7 +355,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             self.imagePickerController = nil
             
             
-            // Log.info("info = \(info)")
+            // SNLog.info("info = \(info)")
             
             /* Example of info dictionary:
             
@@ -380,7 +380,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                 
                 // Camera movie
                 if sourceType == .Camera {
-                    //Log.info("Movie type.  Taken by Camera.")
+                    //SNLog.info("Movie type.  Taken by Camera.")
                     
                     self.removeExportButton() // If Export button present, remove it.
                     
@@ -389,7 +389,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                     
                     // Movie picked from Library   .SavedPhotosAlbum | .PhotoLibrary
                 else {
-                    //Log.info("Movie type.  Picked from Library.")
+                    //SNLog.info("Movie type.  Picked from Library.")
                     
                     self.addExportButton() // Add Export button if not present
                     
@@ -498,12 +498,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         
     
-        // Log.info("assetURL=\(assetURL)  self.videoURL=\(self.videoURL)")
+        // SNLog.info("assetURL=\(assetURL)  self.videoURL=\(self.videoURL)")
         
         
         // Failure block for following asset fetch
         let assetFailure = { (assetError: NSError!) -> (Void) in
-            Log.error("\(assetError)")
+            SNLog.error("\(assetError)")
             Void()
         }
         
@@ -517,7 +517,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             // Compare to processLibraryMovie_1 where we use videoAsset.creationDate which apparently always incorrectly reflects
             // the current date.
             //
-            Log.info("asset=\(asset)  created: \(asset.valueForProperty(ALAssetPropertyDate))")
+            SNLog.info("asset=\(asset)  created: \(asset.valueForProperty(ALAssetPropertyDate))")
             
             
             // The meta data obtained from ALAssetRepresentation here is empty for a movie.
@@ -526,7 +526,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             let assetRepresentation: ALAssetRepresentation = asset.defaultRepresentation()
             
             let metaDataDict: NSDictionary = assetRepresentation.metadata()
-            // Log.info("metaDataDict=\(metaDataDict)")
+            // SNLog.info("metaDataDict=\(metaDataDict)")
             
             self.processLibraryMovie_0()
             
@@ -564,19 +564,19 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let metadata : [AVMetadataItem] = AVMetadataItem.metadataItemsFromArray(videoAsset.commonMetadata, withKey: nil, keySpace: nil) as [AVMetadataItem]
         
     
-        Log.info("AVAsset metadata = \(metadata)")
+        SNLog.info("AVAsset metadata = \(metadata)")
         
     
         let durationSeconds: Float64 = CMTimeGetSeconds(videoAsset.duration)
-        Log.info("durationSeconds=\(durationSeconds)")
+        SNLog.info("durationSeconds=\(durationSeconds)")
     
         // Some .mov files give correct creation date here?
-        g_fixme = g_anyFixme as Fixme
+        g_fixme = g_anyFixme as SNLog.Fixme
     
         // This creation date is not preferred.  It appears to incorrectly reflect the current date, not the date
         // asset was saved to Camera roll.  Checked with .MOV, .MP4 and .AVI file types.
         //
-        Log.info("creationDate=\(videoAsset.creationDate)")
+        SNLog.info("creationDate=\(videoAsset.creationDate)")
        
         // Disable activity indicator
         self.activityIndicator.stopAnimating()
@@ -745,7 +745,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         // 16:9
         if width == (height * 16.0 / 9.0) {
-            Log.info("16:9")
+            SNLog.info("16:9")
             if width >= 512.0 {
                 width = 512.0
                 height = 288.0
@@ -759,7 +759,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             
             // 4:3
         else if width == (height * 4.0 / 3.0) {
-            Log.info("4:3")
+            SNLog.info("4:3")
             if(width >= 480.0){
                 width = 480.0
                 height = 360.0
@@ -778,20 +778,20 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             // 4:3 (with height <=360),
             // square (with dimension <= 360)
         else {
-            Log.info("Not 16:9 or 4:3")
+            SNLog.info("Not 16:9 or 4:3")
             
             if width > (height * 16.0 / 9.0) {
-                Log.info("Scale down to 16:9")
+                SNLog.info("Scale down to 16:9")
                 height = adjustDownToMultipleOf8(dimension: height, lowerDimensionArr: lowerDimensionArr_16_9)
                 width = height * 16.0 / 9.0
             }
             else if width > (height * 4.0 / 3.0) {
-                Log.info("Scale down to 4:3")
+                SNLog.info("Scale down to 4:3")
                 height = adjustDownToMultipleOf8(dimension: height, lowerDimensionArr: lowerDimensionArr_4_3)
                 width = height * 4.0 / 3.0
             }
             else {
-                Log.info("Scale down to square")
+                SNLog.info("Scale down to square")
                 height = adjustDownToMultipleOf8(dimension: height, lowerDimensionArr: lowerDimensionArr_4_3)
                 width = height
             }
@@ -848,7 +848,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // Temporary output path for MP4 file export before we save to Camera Roll.
         let exportPath: String = NSTemporaryDirectory() + "export.mp4"
         
-        Log.info("exportPath=\(exportPath)")
+        SNLog.info("exportPath=\(exportPath)")
         
         // Make sure file doesn't already exist.
         NSFileManager.defaultManager().removeItemAtPath(exportPath, error: nil)
@@ -866,7 +866,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // as 90 degrees in that case.
         var videoSize: CGSize = videoTrack.naturalSize
         
-        Log.info("videoTrack.naturalSize:  size.width = \(videoSize.width) size.height = \(videoSize.height)")
+        SNLog.info("videoTrack.naturalSize:  size.width = \(videoSize.width) size.height = \(videoSize.height)")
         
         
         // Using SDAVAssetExportSession
@@ -884,7 +884,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let widthToWrite: CGFloat = videoSize.width
         let heightToWrite: CGFloat = videoSize.height
         
-        Log.info("widthToWrite=\(widthToWrite)  heightToWrite=\(heightToWrite)")
+        SNLog.info("widthToWrite=\(widthToWrite)  heightToWrite=\(heightToWrite)")
         
         
         // Get a video composition that includes the scaling needed to fit in videoSize
@@ -973,7 +973,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // Export to temp directory as MP4
         encoder.exportAsynchronouslyWithCompletionHandler { () -> Void in
             if encoder.status == .Completed {
-                Log.info("Video export succeeded")
+                SNLog.info("Video export succeeded")
                 
                 
                 /*
@@ -996,10 +996,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
 
                 self.assetsLibrary.saveVideo(outputURL, toAlbum: "VideoExport", completion: { (assetURL, error) -> Void in
                     if error != nil {
-                        Log.error("saveVideo completion block: \(error)")
+                        SNLog.error("saveVideo completion block: \(error)")
                     }
                     else {
-                        Log.info("Completed saving video")
+                        SNLog.info("Completed saving video")
                         
                         
                         dispatch_sync(dispatch_get_main_queue(), { () -> Void in
@@ -1012,18 +1012,18 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                     }
                     
                     }, failure: { (error) -> Void in
-                        Log.error("saveVideo failure block: \(error)")
+                        SNLog.error("saveVideo failure block: \(error)")
                         Void()
                 })
                 
             } // encoder.status == .Completed
                 
             else if encoder.status == .Cancelled {
-                Log.info("Video export cancelled")
+                SNLog.info("Video export cancelled")
             }
                 
             else {
-                Log.error("Video export failed with error: \(encoder.error.localizedDescription) (\(encoder.error.code))")
+                SNLog.error("Video export failed with error: \(encoder.error.localizedDescription) (\(encoder.error.code))")
             }
             
             
@@ -1069,7 +1069,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         videoComposition.frameDuration = CMTimeMakeWithSeconds( seconds, 600);
         
         
-        Log.info("frameDuration value = \(videoComposition.frameDuration.value)  frameDuration timescale = \(videoComposition.frameDuration.timescale)  nominalFrameRate = \(videoTrack.nominalFrameRate)")
+        SNLog.info("frameDuration value = \(videoComposition.frameDuration.value)  frameDuration timescale = \(videoComposition.frameDuration.timescale)  nominalFrameRate = \(videoTrack.nominalFrameRate)")
         
         
         
@@ -1141,7 +1141,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         
         
-        Log.info("isPortrait=\(isPortrait)  videoSize.width=\(videoSize.width)  videoSize.height=\(videoSize.height)  naturalSize.width=\(videoTrack.naturalSize.width)  naturalSize.height=\(videoTrack.naturalSize.height)  scaleFactor=\(scaleFactor)")
+        SNLog.info("isPortrait=\(isPortrait)  videoSize.width=\(videoSize.width)  videoSize.height=\(videoSize.height)  naturalSize.width=\(videoTrack.naturalSize.width)  naturalSize.height=\(videoTrack.naturalSize.height)  scaleFactor=\(scaleFactor)")
         
         
         
