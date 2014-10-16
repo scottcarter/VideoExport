@@ -14,7 +14,46 @@
  /*
 
   Project created and tested with Xcode Version 6.0.1 (6A317)
- 
+  
+  
+  Table of Contents
+  +++++++++++++++++
+  
+  Overview
+  
+  Criteria Discussion
+    Support for MPMoviePlayerController
+    Support for Dropbox
+    Android Support
+    Bitrate considerations
+    Container
+  
+  Meeting project criteria
+    AVAssetExportSession
+    AVAssetReader/AVAssetWriter
+    SDAVAssetExportSession
+  
+  Misc. Project Notes
+  
+  Portrait Example
+  
+  Preferred transform
+  
+  Contrasting preferred transform with video composition transform
+    Method 1
+    Method 2
+    Comparison of methods
+  
+  Additional References
+    General
+    Temp directory
+    Adding & Retrieving Metadata
+    MPMoviePlayerController
+    UIRequiredDeviceCapabilities
+    Reducing file size
+    Video settings
+  
+  
  
   Overview
   ++++++++++++
@@ -208,6 +247,11 @@
   Otherwise an exception is consistently triggered when a video is loaded.  This
   is a bug in the simulator which does not occur on the real device.
  
+  Some movies do not load in the simulator, but will work fine on the real device.
+  I noted this happening with .AVI files as well as front facing (640 x 480) Portrait
+  movies taken on the iPhone.   This has been traced to an issue with the copyNextSampleBuffer method
+  of AVAssetReaderOutput hanging when a video composition is used.  A bug will be filed with Apple.
+  
 
   Movies in simulator are located in a directory such as:
   /Users/<username>/Library/Developer/CoreSimulator/Devices/<device id>/data/Media/DCIM/100APPLE
