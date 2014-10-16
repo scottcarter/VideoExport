@@ -63,6 +63,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     // From UIImagePickerController, initialized in processLibraryMovie, processCameraMovie
     var videoURL: NSURL!
     
+    // Formed from videoURL
+    var videoAsset: AVAsset!
+    
     var assetsLibrary: ALAssetsLibrary!
     
     var player: MPMoviePlayerController!
@@ -426,6 +429,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     // Main thread
     func playMovie(assetURL: NSURL) -> Void {
         
+        // Important to remove previous player from super view if it exists.
+        if(self.player != nil){
+            self.player.view.removeFromSuperview()
+            self.player = nil
+        }
+
+
+
         self.player = MPMoviePlayerController(contentURL: assetURL)
         
         self.player.view.frame = self.movieView.bounds  // player's frame must match parent's bounds
@@ -445,9 +456,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     // Just captured a new movie.  Export as MP4 to Camera Roll and then begin playback.
     func processCameraMovie(movieInfo: NSDictionary) {
     
-        let videoURL = movieInfo[UIImagePickerControllerMediaURL] as NSURL
+        // Save this to stored property so that it can later be accessed by exportAsset()
+        self.videoURL = movieInfo[UIImagePickerControllerMediaURL] as NSURL
     
-        let videoAsset: AVAsset = AVURLAsset(URL: videoURL, options: nil)
+        // Must use a stored property for videoAsset or else loadValuesAsynchronouslyForKeys will sometimes not 
+        // call its completion handler.
+        self.videoAsset = AVURLAsset(URL: self.videoURL, options: nil)
     
         
         // Provide a callback closure to exportAsset() to be executed on successful
@@ -470,7 +484,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // newly taken movie - see getVideoComposition() which is called via exportAsset()
         let keysToLoad: [String] = ["commonMetadata","duration", "creationDate"]
         
-        videoAsset.loadValuesAsynchronouslyForKeys(keysToLoad, completionHandler: { () -> Void in
+        self.videoAsset.loadValuesAsynchronouslyForKeys(keysToLoad, completionHandler: { () -> Void in
             
             // Completion handler is not called on the main thread, so we need the following dispatch.
             dispatch_sync(dispatch_get_main_queue(), { () -> Void in
@@ -540,7 +554,11 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     // Called by processLibraryMovie after we load movie asset.
     func processLibraryMovie_0() -> Void {
         
-        let videoAsset: AVAsset = AVURLAsset(URL: self.videoURL, options: nil)
+        // Must use a stored property for videoAsset or else loadValuesAsynchronouslyForKeys will sometimes not
+        // call its completion handler.
+        self.videoAsset = AVURLAsset(URL: self.videoURL, options: nil)
+        
+        
         
         // Load the values of any of the specified keys that are not already loaded.
         //
@@ -548,11 +566,11 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // we also use duration in getVideoComposition() which is called via exportAsset()
         let keysToLoad: [String] = ["commonMetadata","duration", "creationDate"]
         
-        videoAsset.loadValuesAsynchronouslyForKeys(keysToLoad, completionHandler: { () -> Void in
+        self.videoAsset.loadValuesAsynchronouslyForKeys(keysToLoad, completionHandler: { () -> Void in
             
             // Completion handler is not called on the main thread, so we need the following dispatch.
             dispatch_sync(dispatch_get_main_queue(), { () -> Void in
-                self.processLibraryMovie_1(videoAsset)
+                self.processLibraryMovie_1()
             })
         })
         
@@ -562,21 +580,21 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     // Called by processLibraryMovie_0 after we have loaded specified keys of the video asset.
     //
-    func processLibraryMovie_1(videoAsset: AVAsset) {
+    func processLibraryMovie_1() {
         
         // All metadata (key, keySpace nil)
-        let metadata : [AVMetadataItem] = AVMetadataItem.metadataItemsFromArray(videoAsset.commonMetadata, withKey: nil, keySpace: nil) as [AVMetadataItem]
+        let metadata : [AVMetadataItem] = AVMetadataItem.metadataItemsFromArray(self.videoAsset.commonMetadata, withKey: nil, keySpace: nil) as [AVMetadataItem]
         
     
         SNLog.info("AVAsset metadata = \(metadata)")
         
     
-        let durationSeconds: Float64 = CMTimeGetSeconds(videoAsset.duration)
+        let durationSeconds: Float64 = CMTimeGetSeconds(self.videoAsset.duration)
         SNLog.info("durationSeconds=\(durationSeconds)")
     
         // This creation date is not preferred.  I noted that with some movie types (.MP4, .AVI) it appears to
         // incorrectly reflect the current date, not the date asset was saved to Camera roll.
-        SNLog.info("creationDate=\(videoAsset.creationDate)")
+        SNLog.info("creationDate=\(self.videoAsset.creationDate)")
        
         // Disable activity indicator
         self.activityIndicator.stopAnimating()
