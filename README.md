@@ -1,7 +1,7 @@
 
 ## About
 
-This is a Swift based project that is intended to show how various video formats and orientations can be
+This is an iOS Swift based project that is intended to show how various video formats and orientations can be
 read and exported for maximum compatibility across clients and reduced size.
 
 ## Criteria
@@ -14,6 +14,16 @@ The following criteria was used for export:
   4. Video bitrate reduced to average of 725,000 bps
   5. MP4 container
   
+
+## Installation
+
+Navigate to the folder where you downloaded the project (Ex: VideoExport-master) and execute
+
+pod install
+
+Assumes that CocoaPods is installed on your system.
+
+
 ## Details
 
 There is extensive details about the project including how I established the criteria to be used in the file
