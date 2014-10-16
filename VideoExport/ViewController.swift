@@ -49,7 +49,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     
+    // An array of our toolbar buttons.   For the device this includes Camera and Library buttons.
+    // On the simulator (which doesn't provide camera support) it only includes the Library button.
     var initialToolbarItems: [UIBarButtonItem]!
+    
     
     // Property that we use to record height of status bar.
     var statusBarHeight: CGFloat!
@@ -80,13 +83,18 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // Pause any currently running playback.
         self.player?.pause()
         
-        
-        g_fixme = g_anyFixme as SNLog.Fixme
-        // Investigate transitions?
-        // http://stackoverflow.com/questions/18890003/uiimagepickercontroller-error-snapshotting-a-view-that-has-not-been-rendered-re
-       
+    
+        // Note that there is a known issue in iOS 8 that causes a warning whenever
+        // UIImagePickerController is used with the Camera:
+        //
+        // "Snapshotting a view that has not been rendered results in an empty snapshot. 
+        //  Ensure your view has been rendered at least once before snapshotting or snapshot 
+        //  after screen updates."
+        //
+        // Reference:
+        // http://stackoverflow.com/questions/25884801/ios-8-snapshotting-a-view-that-has-not-been-rendered-results-in-an-empty-snapsho?lq=1
+        //
         self.showImagePickerForSourceType(.Camera)
-        
         
     }
     
@@ -101,8 +109,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     
-    // Save asset as MP4 to Camera roll.  This method is available when a movie
-    // is loaded from Library (we automatically save when we take a new picture).
+    // Save asset as MP4 to Camera roll.  This method (and associated button) is available when a movie
+    // is loaded from the Library.  The button to save is not available after taking a new
+    // movie since new movies are automatically saved to the Camera Roll.
     //
     func saveAction() -> Void {
         
@@ -180,11 +189,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // To ensure a smooth transition in all cases, we update the frames of our movieView and player in this method
         // accounting for the current orientation, prior to exiting full screen mode
         //
-        var oldViewWidth: CGFloat =  self.view.bounds.size.width
-        var oldViewHeight: CGFloat = self.view.bounds.size.height
+        var currentViewWidth: CGFloat =  self.view.bounds.size.width
+        var currentViewHeight: CGFloat = self.view.bounds.size.height
         
-        var currentViewWidth: CGFloat
-        var currentViewHeight: CGFloat
         
         let orientation: UIDeviceOrientation = UIDevice.currentDevice().orientation
         
@@ -193,15 +200,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         
         if (orientation == .Portrait || orientation == .PortraitUpsideDown) {
-            currentViewWidth = oldViewWidth < oldViewHeight ? oldViewWidth : oldViewHeight // Min
-            currentViewHeight = oldViewWidth > oldViewHeight ? oldViewWidth : oldViewHeight // Max
-            
             statusBarHeight = self.statusBarHeight // Set in viewDidLayoutSubviews
         }
         else { // Landscape or Face down
-            currentViewWidth = oldViewWidth > oldViewHeight ? oldViewWidth : oldViewHeight // Max
-            currentViewHeight = oldViewWidth < oldViewHeight ? oldViewWidth : oldViewHeight // Min
-            
             statusBarHeight = 0.0 // Status bar not present in landscape mode (iOS 8)
         }
         
@@ -232,6 +233,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        
         
     
         // Cleanup the tmp directory on each launch.
@@ -320,7 +323,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         if self.statusBarHeight == nil {
             let statusBarSize: CGSize = UIApplication.sharedApplication().statusBarFrame.size
             
-            // Min
+            // We capture the height as the minimum of statusBarSize.width, statusBarSize.height
+            // During orientation changes, the true status bar height isn't always statusBarSize.height.
+            // 
+            // In this particular case, it would have been safe to just use statusBarSize.height
             self.statusBarHeight = statusBarSize.width < statusBarSize.height ? statusBarSize.width : statusBarSize.height
             
             // SNLog.info("statusBarSize=\(statusBarSize)  self.statusBarHeight=\(self.statusBarHeight)")
@@ -371,9 +377,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             // Movie
             if mediaType == kUTTypeMovie as NSString {
                 
-                var toolbarItems: [UIBarButtonItem] = self.toolbar.items as [UIBarButtonItem]
-                
-                
                 // Start activity indicator
                 self.activityIndicator.hidden = false
                 self.activityIndicator.startAnimating()
@@ -382,7 +385,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                 if sourceType == .Camera {
                     //SNLog.info("Movie type.  Taken by Camera.")
                     
-                    self.removeExportButton() // If Export button present, remove it.
+                    // Restore our initial set of Toolbar buttons, which will remove Save button if present.
+                    self.restoreInitialButtonItems()
                     
                     self.processCameraMovie(info)
                 }
@@ -391,7 +395,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                 else {
                     //SNLog.info("Movie type.  Picked from Library.")
                     
-                    self.addExportButton() // Add Export button if not present
+                    self.addSaveButton() // Add Save button if not present
                     
                     self.processLibraryMovie(info)
                 }
@@ -438,18 +442,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
 
     
-    
+    // Just captured a new movie.  Export as MP4 to Camera Roll and then begin playback.
     func processCameraMovie(movieInfo: NSDictionary) {
     
-        self.videoURL = movieInfo[UIImagePickerControllerMediaURL] as NSURL
+        let videoURL = movieInfo[UIImagePickerControllerMediaURL] as NSURL
     
-        let videoAsset: AVAsset = AVURLAsset(URL: self.videoURL, options: nil)
+        let videoAsset: AVAsset = AVURLAsset(URL: videoURL, options: nil)
     
-        // Load some keys for videoAsset.  Currently only using duration with a
-        // newly taken movie - see getVideoComposition() which is called via exportAsset()
-        let keysToLoad: [String] = ["commonMetadata","duration", "creationDate"]
-        
-        
         
         // Provide a callback closure to exportAsset() to be executed on successful
         // completion of export and save to Camera Roll.
@@ -467,8 +466,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         }
 
         
+        // Load some keys for videoAsset.  Currently only using duration with a
+        // newly taken movie - see getVideoComposition() which is called via exportAsset()
+        let keysToLoad: [String] = ["commonMetadata","duration", "creationDate"]
         
         videoAsset.loadValuesAsynchronouslyForKeys(keysToLoad, completionHandler: { () -> Void in
+            
+            // Completion handler is not called on the main thread, so we need the following dispatch.
             dispatch_sync(dispatch_get_main_queue(), { () -> Void in
                 self.exportAsset(closure)
             })
@@ -483,8 +487,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
 
     
 
-    // User selected movie from Library
-    //
+    // User selected movie from Library.  Load and begin playback.
     func processLibraryMovie(movieInfo: NSDictionary) -> Void {
     
         // URL for asset in Library
@@ -493,9 +496,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         // URL for .MOV file in file system
         // Ex: file:///private/var/mobile/Containers/Data/Application/332AE4BB-0CB4-4CD8-871F-BA31A1BF08EC/tmp/trim.EE23B54E-E440-4F3D-AC4B-D687474DE6D6.MOV
+        //
+        // Save this to stored property so that it can later be accessed by exportAsset() in case we save.
         self.videoURL = movieInfo[UIImagePickerControllerMediaURL] as NSURL
-    
-        
         
     
         // SNLog.info("assetURL=\(assetURL)  self.videoURL=\(self.videoURL)")
@@ -514,15 +517,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             
             // This creation date is when asset was saved to Camera Roll.  It is the preferred means to get this date.
             //
-            // Compare to processLibraryMovie_1 where we use videoAsset.creationDate which apparently always incorrectly reflects
-            // the current date.
+            // Compare to processLibraryMovie_1 where we use videoAsset.creationDate which incorrectly reflects
+            // the current date for some movie file types.
             //
             SNLog.info("asset=\(asset)  created: \(asset.valueForProperty(ALAssetPropertyDate))")
             
             
             // The meta data obtained from ALAssetRepresentation here is empty for a movie.
             // In the method processLibraryMovie_1 we show how to correctly get meta data.
-            //
             let assetRepresentation: ALAssetRepresentation = asset.defaultRepresentation()
             
             let metaDataDict: NSDictionary = assetRepresentation.metadata()
@@ -547,6 +549,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let keysToLoad: [String] = ["commonMetadata","duration", "creationDate"]
         
         videoAsset.loadValuesAsynchronouslyForKeys(keysToLoad, completionHandler: { () -> Void in
+            
+            // Completion handler is not called on the main thread, so we need the following dispatch.
             dispatch_sync(dispatch_get_main_queue(), { () -> Void in
                 self.processLibraryMovie_1(videoAsset)
             })
@@ -560,7 +564,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     //
     func processLibraryMovie_1(videoAsset: AVAsset) {
         
-        // All metadata (key, keySpace nil
+        // All metadata (key, keySpace nil)
         let metadata : [AVMetadataItem] = AVMetadataItem.metadataItemsFromArray(videoAsset.commonMetadata, withKey: nil, keySpace: nil) as [AVMetadataItem]
         
     
@@ -570,12 +574,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let durationSeconds: Float64 = CMTimeGetSeconds(videoAsset.duration)
         SNLog.info("durationSeconds=\(durationSeconds)")
     
-        // Some .mov files give correct creation date here?
-        g_fixme = g_anyFixme as SNLog.Fixme
-    
-        // This creation date is not preferred.  It appears to incorrectly reflect the current date, not the date
-        // asset was saved to Camera roll.  Checked with .MOV, .MP4 and .AVI file types.
-        //
+        // This creation date is not preferred.  I noted that with some movie types (.MP4, .AVI) it appears to
+        // incorrectly reflect the current date, not the date asset was saved to Camera roll.
         SNLog.info("creationDate=\(videoAsset.creationDate)")
        
         // Disable activity indicator
@@ -609,8 +609,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         if (sourceType == .Camera) {
             
-            
-            
             // Choose front or back facing camera.
             // When showsCameraControls = YES, this can set which camera view appears first. Rear facing camera by default.
             //
@@ -636,7 +634,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             
         else if(sourceType == .PhotoLibrary) {
             
-            // Compress selected movie to 640 x 480
+            // Compress selected movie to 640 x 480 (4:3 source) or 640 x 360 (16:9 source)
             //
             // Note: Compressing a High quality source takes a long time no matter whether Library picker is set
             //       for High, 640x480 or Medium.
@@ -661,25 +659,20 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     // We do 2 things here:
     //
-    // 1. Flip width/height for Portrait
+    // 1. Flip width/height when the preferred transform has a rotation of 90 or 270 degrees.
     // 2. Adjust resolution to be no greater than 512 x 288 (16:9) or 480 x 360 (4:3).
     //    If not one of these ratios, use square and not greater than 360.
     //    If min dimension is less than 360, use next lower dimension that is a factor of 8.
     //
     func adjustVideoSize(videoSize: CGSize, videoAsset: AVAsset) -> CGSize {
         
-        
-
         var widthToWrite: CGFloat = videoSize.width
         var heightToWrite: CGFloat = videoSize.height
         
-        let isPortrait: Bool = isVideoPortrait(videoAsset)
+        let isRotated90_270: Bool = isVideoRotated90_270(videoAsset)
         
-        // Flip width/height for Portrait
-        //
-        // In Portrait, we still have width > height, but with rotation = 90 degrees.
-        // We need to flip it for our export (which will occur with a rotation = 0)
-        if isPortrait  {
+        // Flip width/height for a 90 or 270 degree rotation.
+        if isRotated90_270  {
             widthToWrite = videoSize.height
             heightToWrite = videoSize.width
         }
@@ -704,11 +697,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         var height: CGFloat = videoSize.height
         
         
-        
         // At this point width and height are proper for an export rotation of 0 degrees
         // (height > width for Portrait)
         //
-        // Swap width and height if height > width
+        // Swap width and height (temporarily) if height > width
         // We want width as larger dimension for our calculations.
         //
         // We will swap back width/height for Portrait at the end of this method after getting new
@@ -843,6 +835,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     //
     func exportAsset(callback: (assetURL: NSURL) -> Void) -> Void {
         
+        // self.videoURL was previously set when we loaded movie from Library
         let videoAsset: AVAsset = AVURLAsset(URL: self.videoURL, options: nil)
         
         // Temporary output path for MP4 file export before we save to Camera Roll.
@@ -859,11 +852,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         let videoTrack: AVAssetTrack = videoAsset.tracksWithMediaType(AVMediaTypeVideo).first as AVAssetTrack
         
+        
+        
         // The naturalSize should be no greater than 640 x 480 as we selected in
         // showImagePickerForSourceType() for UIImagePickerController
-        //
-        // Note that the width will exceed height even for Portrait, but rotation will be marked
-        // as 90 degrees in that case.
         var videoSize: CGSize = videoTrack.naturalSize
         
         SNLog.info("videoTrack.naturalSize:  size.width = \(videoSize.width) size.height = \(videoSize.height)")
@@ -875,9 +867,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let encoder: SDAVAssetExportSession = SDAVAssetExportSession(asset: videoAsset)
         
         
-        
-        // Adjust videoSize for dimensions and orientation.  
-        // We will need to swap width/height for Portrait and possibly reduce dimensions.
+        // Adjust videoSize for dimensions and orientation.
+        // We will need to swap width/height for rotations of 90 or 270 degrees and possibly reduce dimensions.
         videoSize = adjustVideoSize(videoSize, videoAsset: videoAsset)
         
         
@@ -887,7 +878,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         SNLog.info("widthToWrite=\(widthToWrite)  heightToWrite=\(heightToWrite)")
         
         
-        // Get a video composition that includes the scaling needed to fit in videoSize
+        // Get a video composition that includes the scaling/cropping needed to fit in videoSize
         encoder.videoComposition = getVideoComposition(videoAsset, videoSize: videoSize)
         
         
@@ -956,7 +947,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         mi = AVMutableMetadataItem()
         mi.key = AVMetadataCommonKeyAuthor
         mi.keySpace = AVMetadataKeySpaceCommon
-        mi.value = jsonStr
+        mi.value = jsonStr  // Our custom JSON data
         updatedMetadata.append(mi)
         
         
@@ -965,7 +956,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         mi.keySpace = AVMetadataKeySpaceCommon
         mi.value = "*** My Custom Description ***"
         updatedMetadata.append(mi)
-        
         
         encoder.metadata = updatedMetadata
         
@@ -1037,10 +1027,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     // References:
     //
-    // Forming videoComposition by Prince
-    // http://stackoverflow.com/questions/12136841/avmutablevideocomposition-rotated-video-captured-in-portrait-mode
-    //
-    // Code by BornCoder
+    // See code samples by Prince, BornCoder
     // http://stackoverflow.com/questions/12136841/avmutablevideocomposition-rotated-video-captured-in-portrait-mode
     //
     func getVideoComposition(asset: AVAsset, videoSize: CGSize) -> AVMutableVideoComposition {
@@ -1049,11 +1036,11 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         var videoComposition: AVMutableVideoComposition = AVMutableVideoComposition()
         
-        var isPortrait: Bool = isVideoPortrait(asset)
+        var isRotated90_270: Bool = isVideoRotated90_270(asset)
         
         
         // If the aspect ratio of videoSize is different than that of videoTrack.naturalSize
-        // (after accounting for possible swap of width/height for Portrait) than setting
+        // (after accounting for possible swap of width/height of videoTrack.naturalSize for 90/270 rotation) than setting
         // the videoComposition.renderSize will crop.
         //
         // If for example our original aspect ratio was non-standard and less than 4:3, 
@@ -1072,8 +1059,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         SNLog.info("frameDuration value = \(videoComposition.frameDuration.value)  frameDuration timescale = \(videoComposition.frameDuration.timescale)  nominalFrameRate = \(videoTrack.nominalFrameRate)")
         
         
-        
-        
         var videolayerInstruction: AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
         
         
@@ -1081,19 +1066,18 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         var scaleFactor: CGFloat!
         
         
-        
         // If we crop to a square, apply a transform in either x or y direction to center video.
         var translationTransform: CGAffineTransform!
         
         
+        // Get the original width and height that we would have if the rotation were 0 (or 180) degrees.
+        // We derive this from videoTrack.naturalSize
+        var originalWidth: CGFloat = isRotated90_270 ? videoTrack.naturalSize.height : videoTrack.naturalSize.width
+        var originalHeight: CGFloat = isRotated90_270 ? videoTrack.naturalSize.width : videoTrack.naturalSize.height
         
         // Scale video for Portrait
         //
-        // Note that we already swapped width and height in videoSize (prior to calling this method) if this was Portrait,
-        // so videoSize.width is now correct for exporting with a 0 degree rotation.
-        //
-        // videoTrack.naturalSize.height here is the original Portrait width (with a 90 degree rotation).
-        if(isPortrait) {
+        if(originalHeight > originalWidth) {
             
             // Does it matter whether we base scaleFactor on width or height?  Yes!
             // If we resize to a square we do not want to scale the width lower than 
@@ -1104,7 +1088,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             //           If we instead scaled by 360 (new height)/640 (orig height) = 0.5625 then in the new video
             //           the width has a black border on one side and the height content is fully visible (no truncation).
             //
-            scaleFactor = videoSize.width/videoTrack.naturalSize.height
+            scaleFactor = videoSize.width/originalWidth
             
             // If we need to center for Portrait because we are cropping, shift up by half the 
             // height of scaled video.
@@ -1114,7 +1098,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         else {
             // For Landscape we want to scale by height.  The reason is similar to why we used width above
             // in choosing a scale factor for Portrait.
-            scaleFactor = videoSize.height / videoTrack.naturalSize.height
+            scaleFactor = videoSize.height / originalHeight
             
             // If we need to center for Landscape because we are cropping, shift left by half the 
             // width of scaled video.
@@ -1139,9 +1123,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         
         
-        
-        
-        SNLog.info("isPortrait=\(isPortrait)  videoSize.width=\(videoSize.width)  videoSize.height=\(videoSize.height)  naturalSize.width=\(videoTrack.naturalSize.width)  naturalSize.height=\(videoTrack.naturalSize.height)  scaleFactor=\(scaleFactor)")
+        SNLog.info("isRotated90_270=\(isRotated90_270)  videoSize.width=\(videoSize.width)  videoSize.height=\(videoSize.height)  naturalSize.width=\(videoTrack.naturalSize.width)  naturalSize.height=\(videoTrack.naturalSize.height)  scaleFactor=\(scaleFactor)")
         
         
         
@@ -1162,15 +1144,28 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
 
-    // Determine if movie is in Portrait or Landscape mode.
+    // Determine if movie is rotated 90 or 270 degrees.
     //
     // Reference:
     // Post by Prince
     // http://stackoverflow.com/questions/12136841/avmutablevideocomposition-rotated-video-captured-in-portrait-mode
     //
-    func isVideoPortrait(asset: AVAsset) -> Bool {
+    // Unlike the article referenced above, we don't try to distinguish between Portrait or Landscape 
+    // here.  To do so would require us to look at the width to height ratio in addition to the 
+    // preferred transform.  This determination is not important though.
+    //
+    // What we really want to know is whether or not we have a 90 or 270 degree rotation which would
+    // cause us to swap the width and height during export.
+    //
+    // It's interesting to note that it is conceivable that we have a source video in Landscape whose
+    // width is less than the height with a rotation of 90 or 270 degrees.   When exporting this Landscape
+    // movie in this case, we will also want to swap width and height - ie. swapping is not restricted to just
+    // Portrait movies, though Portrait may be the common case.
+    //
+    func isVideoRotated90_270(asset: AVAsset) -> Bool {
         
-        var isPortrait = false
+        
+        var isRotated90_270 = false
         
         let tracks: [AVAssetTrack] = asset.tracksWithMediaType(AVMediaTypeVideo) as [AVAssetTrack]
         
@@ -1178,33 +1173,49 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             
             let videoTrack: AVAssetTrack = tracks[0]
             
-            let t: CGAffineTransform = videoTrack.preferredTransform
-            // Portrait
+
+            
+            // See docs for CGAffineTransformMakeRotation where one can calculate the matrix values a,b,c,d below
+            // for varying degrees of rotation.
+            
+
+            var t: CGAffineTransform = videoTrack.preferredTransform
+            
+            // 90 degree rotation (PI / 2 radians)
+            //
             if t.a == 0 && t.b == 1.0 && t.c == -1.0 && t.d == 0 {
-                isPortrait = true
+                isRotated90_270 = true
             }
-            // PortraitUpsideDown
+            
+            // 270 degree rotation (3 PI / 2 radians)
+            //
             if t.a == 0 && t.b == -1.0 && t.c == 1.0 && t.d == 0  {
-                isPortrait = true
+                isRotated90_270 = true
             }
-            // LandscapeRight
+            
+            // 0 degree rotation
+            // CGAffineTransformIdentity
+            // The identity transform.
+            //
             if t.a == 1.0 && t.b == 0 && t.c == 0 && t.d == 1.0  {
-                isPortrait = false
+                isRotated90_270 = false
             }
-            // LandscapeLeft
+            
+            // 180 degree rotation (PI radians)
+            //
             if t.a == -1.0 && t.b == 0 && t.c == 0 && t.d == -1.0 {
-                isPortrait = false
+                isRotated90_270 = false
             }
         }
         
-        return isPortrait
+        return isRotated90_270
     }
 
     
     
     // MARK:  Toolbar methods
     
-    func addExportButton() -> Void {
+    func addSaveButton() -> Void {
         
         let toolbarItems: [UIBarButtonItem] =  self.toolbar.items as [UIBarButtonItem]
         
@@ -1223,7 +1234,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     
-    func removeExportButton() -> Void {
+    func restoreInitialButtonItems() -> Void {
         
         let toolbarItems: [UIBarButtonItem] =  self.toolbar.items as [UIBarButtonItem]
         
@@ -1239,18 +1250,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     
-    
-    // MARK: Utility methods
-    
-    func degreesToRadians(angle: CGFloat) -> (CGFloat) {
-        return angle / 180.0 * CGFloat(M_PI)
-    }
-    
-    func radiansToDegrees(angle: CGFloat) -> (CGFloat) {
-        return angle * 180.0 / CGFloat(M_PI)
-    }
-    
-    
+
 }
 
 

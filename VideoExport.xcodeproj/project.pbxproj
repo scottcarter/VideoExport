@@ -109,18 +109,14 @@
 		A7E7BB7119CCCEC100B97941 /* VideoExport */ = {
 			isa = PBXGroup;
 			children = (
-				A70738AF19E86BCF0022414F /* SNLog.swift */,
-				A7BB70B519DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.h */,
-				A7BB70B619DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m */,
 				A7E7BB9619CD293D00B97941 /* README.h */,
-				A7E7BB7419CCCEC100B97941 /* AppDelegate.swift */,
-				A7E7BB7619CCCEC100B97941 /* ViewController.swift */,
-				A7E7BB7819CCCEC100B97941 /* Main.storyboard */,
 				A7E7BB7B19CCCEC100B97941 /* Images.xcassets */,
-				A7E7BB7219CCCEC100B97941 /* Supporting Files */,
+				A7E7BB7819CCCEC100B97941 /* Main.storyboard */,
+				A7E7BB7619CCCEC100B97941 /* ViewController.swift */,
 				A7BB70B419DC51F300628020 /* VideoExport-Bridging-Header.h */,
 				A7323DAA19E4486600EA848E /* VideoComposition.h */,
 				A7323DAB19E4486600EA848E /* VideoComposition.m */,
+				A7E7BB7219CCCEC100B97941 /* Supporting Files */,
 			);
 			path = VideoExport;
 			sourceTree = "<group>";
@@ -128,6 +124,10 @@
 		A7E7BB7219CCCEC100B97941 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A7E7BB7419CCCEC100B97941 /* AppDelegate.swift */,
+				A7BB70B519DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.h */,
+				A7BB70B619DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m */,
+				A70738AF19E86BCF0022414F /* SNLog.swift */,
 				A7E7BB7319CCCEC100B97941 /* Info.plist */,
 			);
 			name = "Supporting Files";
