@@ -23,6 +23,31 @@ pod install
 
 Assumes that CocoaPods is installed on your system.
 
+## Issues
+
+### Simulator hang bug
+
+Some videos cannot be processed on the simulator, but will work fine on a real device.  
+
+This is an Xcode bug that has been documented in the following article:
+[Simulator hang bug](http://finalize.com/2014/10/18/using-a-video-composition-to-process-certain-videos-causes-an-xcode-simulator-hang/) 
+
+A bug report has been filed with Apple.   A project demonstrating the bug can be found at:
+[GitHub VideoCompositionSimulatorBug](https://github.com/scottcarter/VideoCompositionSimulatorBug)
+
+There is no known workaround.
+
+### CMTime bug
+
+There exists a bug on the simulator wherein a CMTime structure can get corrupted when it is passed from Swift to Objective-C. 
+It occurs only on the iPhone 4S and iPhone 5 configurations.   The bug has been documented in the article:
+[CMTime bug](http://finalize.com/2014/10/08/xcode-simulator-bug-with-swift-to-objective-c-call-passing-cmtime-structure/)
+
+A bug report has been filed with Apple.   A project demonstrating the bug can be found at:
+[GitHub CMTimeBug](https://github.com/scottcarter/CMTimeBug)
+
+A workaround exists and has been implemented in the method getVideoComposition() in ViewController.swift.
+
 
 ## Details
 
