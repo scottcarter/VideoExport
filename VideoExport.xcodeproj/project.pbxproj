@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		6D12C448D8F283CFBB35FB6C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 491CFD608DD5FB8039D1DEF1 /* libPods.a */; };
 		A70738B019E86BCF0022414F /* SNLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70738AF19E86BCF0022414F /* SNLog.swift */; };
-		A712CBF719F06AD8001D55D1 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = A712CBF619F06AD8001D55D1 /* README.md */; };
 		A7323DAC19E4486600EA848E /* VideoComposition.m in Sources */ = {isa = PBXBuildFile; fileRef = A7323DAB19E4486600EA848E /* VideoComposition.m */; };
 		A7BB70B719DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BB70B619DC633C00628020 /* ALAssetsLibrary+CustomPhotoAlbum.m */; };
 		A7E7BB7519CCCEC100B97941 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E7BB7419CCCEC100B97941 /* AppDelegate.swift */; };
@@ -287,7 +286,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A712CBF719F06AD8001D55D1 /* README.md in Sources */,
 				A7323DAC19E4486600EA848E /* VideoComposition.m in Sources */,
 				A70738B019E86BCF0022414F /* SNLog.swift in Sources */,
 				A7E7BB7719CCCEC100B97941 /* ViewController.swift in Sources */,
