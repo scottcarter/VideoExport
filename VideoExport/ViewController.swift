@@ -865,7 +865,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         NSFileManager.defaultManager().removeItemAtPath(exportPath, error: nil)
         
         
-        let outputURL: NSURL = NSURL(fileURLWithPath: exportPath)
+        let outputURL: NSURL = NSURL(fileURLWithPath: exportPath)!
         
         
         let videoTrack: AVAssetTrack = videoAsset.tracksWithMediaType(AVMediaTypeVideo).first as AVAssetTrack
@@ -943,7 +943,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // Create new data for AVMetadataCommonKeyAuthor illustrating how to add JSON info.
         let jsonDict: Dictionary<String, String> = ["id":"8923367945771", "t":"1400696865"]
         let jsonData:NSData = NSJSONSerialization.dataWithJSONObject(jsonDict, options: .PrettyPrinted, error: nil)!
-        let jsonStr: NSString = NSString(data: jsonData, encoding: NSUTF8StringEncoding)
+        let jsonStr: NSString = NSString(data: jsonData, encoding: NSUTF8StringEncoding)!
         
         
         // New AVMutableMetadataItem for added values
